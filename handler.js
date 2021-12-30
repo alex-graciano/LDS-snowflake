@@ -1,3 +1,39 @@
+/**********************************************************************
+ *
+ * Geocoding lambda
+ *
+ * This function is intended to be used as a common lambda to reach the
+ * Location Data Services CARTO API to be used for our clouds providers
+ * So far, we support:
+ * - Snowflake
+ * - Redshift
+ * 
+ * Each cloud deals with the data I/O un a different way. Examples:
+ * 
+ * Redshift:
+ * - Input = {arguments:[
+ *              [argument1_row1, argument2_row1, ..., argumentN_row1],
+ *                ...
+ *              [argument1_rowN, argument2_rowN, ..., argumentN_rowN]
+ *            ]}
+ * - Output = "["stringified_result1", ..., "stringified_resultN"]"
+ *
+ * Snowflake:
+ * - Input = {data:[
+ *              [0, argument1_row1, argument2_row1, ..., argumentN_row1],
+ *                ...
+ *              [N, argument1_rowN, argument2_rowN, ..., argumentN_rowN]
+ *            ]}
+ * - Output = {data:[[0, result0], ..., [N, resultN]]
+
+ *
+ **********************************************************************
+ *
+ * Copyright (C) 2021 CARTO
+ *
+ **********************************************************************/
+
+
 'use strict';
 
 const axios = require('axios');
@@ -105,8 +141,7 @@ const getError = (error, cloud) => {
     
     switch(cloud) {
       case 'snowflake':
-        //outputObject.data = [[0, JSON.stringify(error)]];
-        outputObject.data = [[0, "Ha dao un error"]];
+        outputObject.data = [[0, JSON.stringify(error)]];
         break;
       case 'redshift':
         outputObject.results = [JSON.stringify(error)];
